@@ -58,7 +58,7 @@ export const Canvas: React.FC = () => {
                 />
 
                 {/* Main Canvas Area */}
-                <div className="flex-1 relative w-full h-full flex items-center justify-center p-4 lg:pr-80">
+                <div className="flex-1 relative w-full h-full flex items-center justify-center p-4 lg:pr-[380px]">
                     {renderVisualizer()}
                 </div>
             </div>

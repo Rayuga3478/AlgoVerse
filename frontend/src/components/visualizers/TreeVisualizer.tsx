@@ -106,7 +106,6 @@ export const TreeVisualizer: React.FC = () => {
                         return (
                             <motion.div
                                 key={node.data.id}
-                                layoutId={`node-${node.data.id}`}
                                 initial={{ opacity: 0, scale: 0 }}
                                 animate={{
                                     opacity: 1,
