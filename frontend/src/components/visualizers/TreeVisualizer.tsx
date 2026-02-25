@@ -49,20 +49,21 @@ export const TreeVisualizer: React.FC = () => {
         const nodesList = rootNode.descendants();
         const linksList = rootNode.links();
 
-        // Center the root
+        // Center the root vertically by shifting the entire tree up relative to the flex center
         nodesList.forEach(n => {
-            // Shift down slightly
-            n.y += 50;
+            // D3 tree centers x around 0 automatically
+            // Y starts at 0, so we shift it up so the root is near the top of the container
+            n.y -= 200;
         });
 
         return { nodes: nodesList, links: linksList };
     }, [root]);
 
     return (
-        <div className="relative w-full h-[500px] flex justify-center overflow-visible">
+        <div className="relative w-full h-[500px] flex items-center justify-center overflow-visible">
 
             {/* Edges - SVG Layer */}
-            <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ overflow: 'visible', transform: 'translateX(50%)' }}>
+            <svg className="absolute inset-0 w-full h-full pointer-events-none overflow-visible">
                 <g>
                     <AnimatePresence>
                         {links.map((link) => {
@@ -95,7 +96,7 @@ export const TreeVisualizer: React.FC = () => {
             </svg>
 
             {/* Nodes - HTML Layer */}
-            <div className="absolute inset-0 w-full h-full pointer-events-none" style={{ transform: 'translateX(50%)' }}>
+            <div className="absolute inset-0 w-full h-full pointer-events-none flex items-center justify-center">
                 <AnimatePresence>
                     {nodes.map((node) => {
                         if ((node.data as any).isDummy) return null;
