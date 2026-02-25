@@ -62,8 +62,8 @@ export const TreeVisualizer: React.FC = () => {
         <div className="relative w-full h-[500px] flex justify-center overflow-visible">
 
             {/* Edges - SVG Layer */}
-            <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ overflow: 'visible' }}>
-                <g transform="translate(50%, 0)">
+            <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ overflow: 'visible', transform: 'translateX(50%)' }}>
+                <g>
                     <AnimatePresence>
                         {links.map((link) => {
                             if ((link.target.data as any).isDummy || (link.source.data as any).isDummy) return null;

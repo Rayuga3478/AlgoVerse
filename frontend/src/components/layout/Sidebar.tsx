@@ -25,15 +25,16 @@ export const Sidebar: React.FC = () => {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to generate visualization');
+                const errorData = await response.json().catch(() => null);
+                throw new Error(errorData?.details || errorData?.error || 'Failed to generate visualization');
             }
 
             const animationData = await response.json();
             setAnimation(animationData);
             setPrompt('');
-        } catch (error) {
+        } catch (error: any) {
             console.error(error);
-            alert('Error connecting to AI backend. Ensure backend is running.');
+            setErrorMsg(error.message || 'Error connecting to AI backend.');
         } finally {
             setIsLoading(false);
         }
