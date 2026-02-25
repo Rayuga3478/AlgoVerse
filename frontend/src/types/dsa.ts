@@ -30,6 +30,7 @@ export interface Complexity {
 export interface AlgorithmAnimation<T = BaseState> {
     structure: DataStructureType;
     title: string;
+    algorithm?: string[];
     complexity: Complexity;
     steps: TransitionStep<T>[];
 }

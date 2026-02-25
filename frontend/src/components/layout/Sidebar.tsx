@@ -75,7 +75,7 @@ export const Sidebar: React.FC = () => {
                     <div className="space-y-6">
                         <div className="mb-4">
                             <h2 className="text-xl font-semibold text-white mb-2">{animation.title}</h2>
-                            <div className="flex gap-2">
+                            <div className="flex gap-2 mb-4">
                                 <span className="px-3 py-1 rounded-full text-xs font-semibold bg-violet-500/20 text-violet-300 border border-violet-500/30">
                                     Time: {animation.complexity.time}
                                 </span>
