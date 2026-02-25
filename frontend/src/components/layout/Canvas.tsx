@@ -40,29 +40,33 @@ export const Canvas: React.FC = () => {
     };
 
     return (
-        <div className="flex-1 relative overflow-hidden bg-black/40">
+        <div className="flex-1 w-full h-full relative p-4 lg:p-8 flex items-center justify-center">
 
-            {/* Dynamic Background Grid Pattern */}
-            <div
-                className="absolute inset-0 pointer-events-none opacity-20"
-                style={{
-                    backgroundImage: `
-            linear-gradient(to right, #ffffff05 1px, transparent 1px),
-            linear-gradient(to bottom, #ffffff05 1px, transparent 1px)
-          `,
-                    backgroundSize: '40px 40px',
-                }}
-            />
+            {/* The Main Frosted Glass Panel Container */}
+            <div className="w-full h-full glass-panel rounded-[2.5rem] relative overflow-hidden flex flex-col shadow-[0_20px_60px_rgba(0,0,0,0.5)] border-t border-l border-white/20">
 
-            {/* Main Canvas Area */}
-            <div className="absolute inset-0 flex items-center justify-center p-12">
-                {renderVisualizer()}
+                {/* Dynamic Background Grid Pattern */}
+                <div
+                    className="absolute inset-0 pointer-events-none opacity-20"
+                    style={{
+                        backgroundImage: `
+                linear-gradient(to right, #ffffff05 1px, transparent 1px),
+                linear-gradient(to bottom, #ffffff05 1px, transparent 1px)
+              `,
+                        backgroundSize: '60px 60px',
+                    }}
+                />
+
+                {/* Main Canvas Area */}
+                <div className="flex-1 relative w-full h-full flex items-center justify-center p-4 lg:pr-80">
+                    {renderVisualizer()}
+                </div>
             </div>
 
             {/* Algorithm Overlay Panel */}
             {animation?.algorithm && Array.isArray(animation.algorithm) && animation.algorithm.length > 0 && (
-                <div className="absolute top-6 right-6 w-80 max-h-[calc(100vh-120px)] overflow-y-auto bg-zinc-950/80 backdrop-blur-xl border border-white/10 shadow-2xl rounded-2xl p-6 custom-scrollbar z-40">
-                    <h3 className="text-xs font-bold text-violet-400 uppercase tracking-widest mb-5 flex items-center gap-2">
+                <div className="absolute top-12 right-12 w-80 max-h-[calc(100vh-160px)] overflow-y-auto glass-panel border-t border-l border-white/20 shadow-2xl rounded-3xl p-6 custom-scrollbar z-40">
+                    <h3 className="text-[10px] font-bold text-white/50 uppercase tracking-[0.2em] mb-5 flex items-center gap-2">
                         <Code2 className="w-4 h-4" />
                         Algorithm Steps
                     </h3>
@@ -71,11 +75,11 @@ export const Canvas: React.FC = () => {
                             // Clean up "Step X:" if the model includes it
                             const cleanStep = step.replace(/^(?:Step\s*\d+:?|\d+\.)\s*/i, '');
                             return (
-                                <div key={idx} className="flex gap-3 items-start">
-                                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-violet-500/20 text-violet-300 text-xs flex items-center justify-center font-bold border border-violet-500/30">
+                                <div key={idx} className="flex gap-3 items-start group">
+                                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-white/5 text-white/50 group-hover:bg-violet-500/20 group-hover:text-violet-300 group-hover:border-violet-500/30 transition-all text-xs flex items-center justify-center font-bold border border-white/10">
                                         {idx + 1}
                                     </span>
-                                    <p className="text-sm text-zinc-300 leading-relaxed pt-0.5">
+                                    <p className="text-sm text-zinc-300/80 leading-relaxed pt-0.5 group-hover:text-zinc-100 transition-colors">
                                         {cleanStep}
                                     </p>
                                 </div>

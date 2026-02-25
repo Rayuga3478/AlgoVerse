@@ -79,7 +79,7 @@ export const TreeVisualizer: React.FC = () => {
                                     animate={{
                                         opacity: 1,
                                         pathLength: 1,
-                                        stroke: isHighlightedEdge ? '#c084fc' : '#52525b', // purple-400 or zinc-600
+                                        stroke: isHighlightedEdge ? '#fda4af' : 'rgba(255,255,255,0.15)', // rose-300 or white/15
                                         strokeWidth: isHighlightedEdge ? 4 : 2,
                                     }}
                                     exit={{ opacity: 0 }}
@@ -110,17 +110,17 @@ export const TreeVisualizer: React.FC = () => {
                                 animate={{
                                     opacity: 1,
                                     scale: 1,
-                                    x: node.x - 24, // center offset (width/2)
-                                    y: node.y - 24,
+                                    x: node.x - 32, // center offset (width/2 for w-16)
+                                    y: node.y - 32,
                                 }}
                                 exit={{ opacity: 0, scale: 0 }}
                                 transition={{ type: "spring", stiffness: 300, damping: 25 }}
                                 className={`
-                  absolute w-12 h-12 rounded-full border-2 flex items-center justify-center font-bold text-lg
-                  shadow-xl transition-colors pointer-events-auto
+                  absolute w-16 h-16 rounded-full border flex items-center justify-center font-space font-light text-2xl
+                  transition-all duration-500 pointer-events-auto backdrop-blur-md
                   ${isHighlighted
-                                        ? 'border-violet-400 bg-violet-900/80 text-white shadow-[0_0_20px_rgba(139,92,246,0.6)] z-10'
-                                        : 'border-zinc-700 bg-zinc-800 text-zinc-300 z-0'
+                                        ? 'border-rose-400/60 bg-rose-500/20 text-white shadow-[0_0_30px_rgba(244,63,94,0.4)] scale-110 z-10'
+                                        : 'border-white/10 bg-white/5 text-white/80 shadow-[0_10px_40px_rgba(0,0,0,0.2)] z-0'
                                     }
                 `}
                             >

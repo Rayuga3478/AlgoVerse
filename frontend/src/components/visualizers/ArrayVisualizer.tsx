@@ -18,26 +18,28 @@ export const ArrayVisualizer: React.FC = () => {
     const highlights = currentStep.highlights || [];
     const pointers = currentStep.pointers || {};
 
+    const isStack = animation.title.toLowerCase().includes('stack') || animation.structure.toLowerCase() === 'stack';
+
     return (
-        <div className="flex flex-col items-center gap-12">
+        <div className={`flex items-center gap-12 ${isStack ? 'flex-row justify-center items-end' : 'flex-col'}`}>
 
-            {/* Pointers Top Area */}
-            <div className="flex gap-4 min-h-[40px] relative w-full justify-center">
-                {Object.entries(pointers).map(([name, index]) => {
-                    if (typeof index !== 'number') return null;
-                    // Calculate approximate position. We will use absolute positioning later for better tracing,
-                    // but for now, we just list them.
-                    return (
-                        <div key={name} className="flex flex-col items-center">
-                            <span className="text-xs text-violet-400 font-mono font-bold mb-1">{name}</span>
-                            <div className="w-1 h-8 bg-violet-500/50 rounded-full" />
-                        </div>
-                    );
-                })}
-            </div>
+            {/* Pointers Top Area - only show if not a stack (or handle differently) */}
+            {!isStack && (
+                <div className="flex gap-4 min-h-[40px] relative w-full justify-center mb-4">
+                    {Object.entries(pointers).map(([name, index]) => {
+                        if (typeof index !== 'number') return null;
+                        return (
+                            <div key={name} className="flex flex-col items-center">
+                                <span className="text-[10px] text-white/50 uppercase tracking-widest font-space font-bold mb-2">{name}</span>
+                                <div className="w-0.5 h-8 bg-gradient-to-b from-transparent to-rose-400/50 rounded-full" />
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
 
-            {/* Array Elements Array */}
-            <div className="flex flex-wrap justify-center gap-4">
+            {/* Array Elements / Stack Elements */}
+            <div className={`flex ${isStack ? 'flex-col-reverse items-center gap-3' : 'flex-wrap justify-center gap-5'}`}>
                 <AnimatePresence>
                     {elements.map((val, idx) => {
                         const isHighlighted = highlights.includes(idx.toString()) || highlights.includes(val.toString());
@@ -46,32 +48,32 @@ export const ArrayVisualizer: React.FC = () => {
                             <motion.div
                                 key={val}
                                 layout
-                                initial={{ opacity: 0, scale: 0.5, y: -20 }}
+                                initial={{ opacity: 0, scale: 0.8, y: -20 }}
                                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                                exit={{ opacity: 0, scale: 0.5, y: 20 }}
+                                exit={{ opacity: 0, scale: 0.8, y: 20 }}
                                 transition={{ type: "spring", stiffness: 300, damping: 25 }}
                                 className={`
                   relative flex flex-col items-center justify-center 
-                  w-16 h-16 rounded-xl border-2 font-mono text-xl font-bold
-                  shadow-lg transition-colors
+                  w-16 h-16 sm:w-20 sm:h-20 rounded-2xl border font-space text-2xl font-light
+                  transition-all duration-500 backdrop-blur-md
                   ${isHighlighted
-                                        ? 'border-violet-400 bg-violet-900/50 text-white shadow-[0_0_15px_rgba(139,92,246,0.6)]'
-                                        : 'border-zinc-700 bg-zinc-800 text-zinc-300'
+                                        ? 'border-rose-400/60 bg-rose-500/20 text-white shadow-[0_0_30px_rgba(244,63,94,0.4)] scale-110 z-10'
+                                        : 'border-white/10 bg-white/5 text-white/80 shadow-[0_10px_40px_rgba(0,0,0,0.2)]'
                                     }
                 `}
                             >
                                 {val}
 
                                 {/* Index label */}
-                                <span className="absolute -bottom-6 text-xs text-zinc-500 font-medium">
+                                <span className={`absolute text-[10px] uppercase tracking-widest text-white/40 font-bold font-space ${isStack ? '-right-8 top-1/2 -translate-y-1/2' : '-bottom-8'}`}>
                                     {idx}
                                 </span>
 
                                 {/* Pointers mapping to this index */}
-                                <div className="absolute -top-6 flex gap-1">
+                                <div className={`absolute flex gap-2 ${isStack ? '-left-16 top-1/2 -translate-y-1/2 flex-col items-end' : '-top-8'}`}>
                                     {Object.entries(pointers).map(([pName, pIdx]) =>
                                         pIdx === idx && (
-                                            <span key={pName} className="px-1.5 py-0.5 bg-violet-600/20 text-violet-300 border border-violet-500/30 rounded text-[10px] font-mono leading-none">
+                                            <span key={pName} className="px-2 py-1 bg-white/10 text-white/80 border border-white/20 rounded-md text-[9px] uppercase tracking-widest font-space font-bold leading-none whitespace-nowrap backdrop-blur-md shadow-lg">
                                                 {pName}
                                             </span>
                                         )
