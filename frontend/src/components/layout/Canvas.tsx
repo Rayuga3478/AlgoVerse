@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useVisualizerStore } from '../../store/useVisualizerStore';
 import { ArrayVisualizer } from '../visualizers/ArrayVisualizer';
 import { TreeVisualizer } from '../visualizers/TreeVisualizer';
 import { GraphVisualizer } from '../visualizers/GraphVisualizer';
-import { Code2 } from 'lucide-react';
+import { Code2, ChevronRight, Menu } from 'lucide-react';
 
 export const Canvas: React.FC = () => {
     const { animation } = useVisualizerStore();
+    const [showSteps, setShowSteps] = useState(true);
 
     const renderVisualizer = () => {
         if (!animation) {
@@ -58,36 +60,72 @@ export const Canvas: React.FC = () => {
                 />
 
                 {/* Main Canvas Area */}
-                <div className="flex-1 relative w-full h-full flex items-center justify-center p-4 lg:pr-[380px]">
+                <div
+                    className={`flex-1 relative w-full h-full flex items-center justify-center p-4 transition-all duration-500 ${showSteps && animation?.algorithm && animation.algorithm.length > 0 ? 'lg:pr-[320px]' : 'lg:pr-4'}`}
+                >
                     {renderVisualizer()}
                 </div>
             </div>
 
             {/* Algorithm Overlay Panel */}
-            {animation?.algorithm && Array.isArray(animation.algorithm) && animation.algorithm.length > 0 && (
-                <div className="absolute top-12 right-12 w-80 max-h-[calc(100vh-160px)] overflow-y-auto glass-panel border-t border-l border-white/20 shadow-2xl rounded-3xl p-6 custom-scrollbar z-40">
-                    <h3 className="text-[10px] font-bold text-white/50 uppercase tracking-[0.2em] mb-5 flex items-center gap-2">
-                        <Code2 className="w-4 h-4" />
-                        Algorithm Steps
-                    </h3>
-                    <div className="space-y-4">
-                        {animation.algorithm.map((step, idx) => {
-                            // Clean up "Step X:" if the model includes it
-                            const cleanStep = step.replace(/^(?:Step\s*\d+:?|\d+\.)\s*/i, '');
-                            return (
-                                <div key={idx} className="flex gap-3 items-start group">
-                                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-white/5 text-white/50 group-hover:bg-violet-500/20 group-hover:text-violet-300 group-hover:border-violet-500/30 transition-all text-xs flex items-center justify-center font-bold border border-white/10">
-                                        {idx + 1}
-                                    </span>
-                                    <p className="text-sm text-zinc-300/80 leading-relaxed pt-0.5 group-hover:text-zinc-100 transition-colors">
-                                        {cleanStep}
-                                    </p>
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
-            )}
+            <AnimatePresence>
+                {showSteps && animation?.algorithm && Array.isArray(animation.algorithm) && animation.algorithm.length > 0 && (
+                    <motion.div
+                        initial={{ opacity: 0, x: 50 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: 50, transition: { duration: 0.2 } }}
+                        transition={{ duration: 0.4, type: "spring", stiffness: 200, damping: 20 }}
+                        className="absolute top-12 right-12 w-72 max-h-[calc(100vh-160px)] overflow-y-auto glass-panel border-t border-l border-white/20 shadow-2xl rounded-3xl p-5 custom-scrollbar z-40"
+                    >
+                        <div className="flex items-center justify-between mb-5">
+                            <h3 className="text-[10px] font-bold text-white/50 uppercase tracking-[0.2em] flex items-center gap-2">
+                                <Code2 className="w-4 h-4" />
+                                Algorithm Steps
+                            </h3>
+                            <button
+                                onClick={() => setShowSteps(false)}
+                                className="text-white/40 hover:text-white/80 p-1 rounded-full hover:bg-white/10 transition-colors"
+                                title="Hide Steps"
+                            >
+                                <ChevronRight className="w-4 h-4" />
+                            </button>
+                        </div>
+                        <div className="space-y-4">
+                            {animation.algorithm.map((step, idx) => {
+                                // Clean up "Step X:" if the model includes it
+                                const cleanStep = step.replace(/^(?:Step\s*\d+:?|\d+\.)\s*/i, '');
+                                return (
+                                    <div key={idx} className="flex gap-3 items-start group">
+                                        <span className="flex-shrink-0 w-6 h-6 rounded-full bg-white/5 text-white/50 group-hover:bg-violet-500/20 group-hover:text-violet-300 group-hover:border-violet-500/30 transition-all text-xs flex items-center justify-center font-bold border border-white/10">
+                                            {idx + 1}
+                                        </span>
+                                        <p className="text-[13px] text-zinc-300/80 leading-relaxed pt-0.5 group-hover:text-zinc-100 transition-colors">
+                                            {cleanStep}
+                                        </p>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Toggle Panel Button (Visible when hidden) */}
+            <AnimatePresence>
+                {!showSteps && animation?.algorithm && Array.isArray(animation.algorithm) && animation.algorithm.length > 0 && (
+                    <motion.button
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.8 }}
+                        transition={{ duration: 0.2 }}
+                        onClick={() => setShowSteps(true)}
+                        className="absolute top-12 right-12 z-50 w-12 h-12 rounded-2xl glass-panel border-t border-l border-white/20 flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition-all shadow-xl backdrop-blur-md"
+                        title="Show Algorithm Steps"
+                    >
+                        <Menu className="w-5 h-5" />
+                    </motion.button>
+                )}
+            </AnimatePresence>
 
         </div>
     );
