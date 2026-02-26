@@ -8,7 +8,7 @@ export const AnimationData: Record<string, AlgorithmAnimation> = {
         steps: [
             {
                 action: 'init',
-                explanation: 'Initial array to be sorted.',
+                explanation: 'Quick Sort is a divide-and-conquer algorithm that picks an element as a pivot and partitions the given array around it. Here is the initial array to be sorted.',
                 state: { array: [8, 3, 1, 7, 0, 10, 2] },
                 highlights: [],
                 pointers: {}

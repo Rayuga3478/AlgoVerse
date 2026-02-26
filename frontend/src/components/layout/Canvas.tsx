@@ -4,6 +4,7 @@ import { useVisualizerStore } from '../../store/useVisualizerStore';
 import { ArrayVisualizer } from '../visualizers/ArrayVisualizer';
 import { TreeVisualizer } from '../visualizers/TreeVisualizer';
 import { GraphVisualizer } from '../visualizers/GraphVisualizer';
+import { LinkedListVisualizer } from '../visualizers/LinkedListVisualizer';
 import { Code2, ChevronRight, Menu } from 'lucide-react';
 
 export const Canvas: React.FC = () => {
@@ -32,6 +33,8 @@ export const Canvas: React.FC = () => {
                 return <TreeVisualizer />;
             case 'graph':
                 return <GraphVisualizer />;
+            case 'linked_list':
+                return <LinkedListVisualizer />;
             default:
                 return (
                     <div className="flex items-center justify-center h-full text-zinc-400">

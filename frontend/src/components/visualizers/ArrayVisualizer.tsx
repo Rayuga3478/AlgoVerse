@@ -21,7 +21,7 @@ export const ArrayVisualizer: React.FC = () => {
     const isStack = animation.title.toLowerCase().includes('stack') || animation.structure.toLowerCase() === 'stack';
 
     return (
-        <div className={`flex items-center gap-12 ${isStack ? 'flex-row justify-center items-end' : 'flex-col'}`}>
+        <div className={`flex items-center gap-12 flex-col`}>
 
             {/* Pointers Top Area - only show if not a stack (or handle differently) */}
             {!isStack && (
@@ -39,7 +39,7 @@ export const ArrayVisualizer: React.FC = () => {
             )}
 
             {/* Array Elements / Stack Elements */}
-            <div className={`flex ${isStack ? 'flex-col-reverse items-center gap-3' : 'flex-wrap justify-center gap-5'}`}>
+            <div className={`flex ${isStack ? 'flex-col-reverse items-center gap-3' : 'flex-row flex-wrap justify-center gap-5'}`}>
                 <AnimatePresence>
                     {elements.map((val, idx) => {
                         const isHighlighted = highlights.includes(idx.toString()) || highlights.includes(val.toString());
