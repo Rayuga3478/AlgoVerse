@@ -28,7 +28,7 @@ body {
     radial-gradient(circle at 50% 80%, rgba(58, 28, 113, 0.4), transparent 50%),
     linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #0f0c29);
   background-size: 400% 400%;
-  animation: gradientShift 15s ease infinite;
+  animation: gradientShift 25s ease infinite;
   color: #f5f5f5;
   font-family: var(--font-inter);
   overflow: hidden;
@@ -159,4 +159,14 @@ h6 {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-image: linear-gradient(to right, var(--color-primary), var(--color-secondary));
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
