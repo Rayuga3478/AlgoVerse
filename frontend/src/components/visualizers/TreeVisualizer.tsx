@@ -41,8 +41,8 @@ export const TreeVisualizer: React.FC = () => {
             return children as TreeNode[];
         });
 
-        // Create a tree layout
-        const treeLayout = d3.tree<TreeNode>().nodeSize([85, 110]);
+        // Create a tree layout with more breathing room to prevent overlaps
+        const treeLayout = d3.tree<TreeNode>().nodeSize([100, 120]);
         const rootNode = treeLayout(hierarchy);
 
         const nodesList = rootNode.descendants();
@@ -69,7 +69,7 @@ export const TreeVisualizer: React.FC = () => {
         // Assuming max available width is ~600px before interfering with UI, and height is 400px
         const scaleX = 600 / Math.max(treeWidth, 1);
         const scaleY = 400 / Math.max(treeHeight, 1);
-        const finalScale = Math.min(1, scaleX, scaleY);
+        const finalScale = Math.min(1.8, scaleX, scaleY);
 
         return { nodes: nodesList, links: linksList, scale: finalScale };
     }, [root]);
@@ -96,18 +96,26 @@ export const TreeVisualizer: React.FC = () => {
                                 return (
                                     <motion.path
                                         key={`${link.source.data.id}-${link.target.data.id}`}
-                                        initial={{ opacity: 0, pathLength: 0 }}
+                                        initial={{
+                                            opacity: 0,
+                                            pathLength: 0,
+                                            d: `M ${link.source.x} ${link.source.y} L ${link.target.x} ${link.target.y}`
+                                        }}
                                         animate={{
                                             opacity: 1,
                                             pathLength: 1,
                                             stroke: isHighlightedEdge ? '#fda4af' : 'rgba(255,255,255,0.15)', // rose-300 or white/15
                                             strokeWidth: isHighlightedEdge ? 4 : 2,
+                                            d: `M ${link.source.x} ${link.source.y} L ${link.target.x} ${link.target.y}`
                                         }}
                                         exit={{ opacity: 0 }}
-                                        transition={{ duration: 0.5, ease: "easeInOut" }}
+                                        transition={{
+                                            d: { type: "spring", stiffness: 300, damping: 25 },
+                                            opacity: { duration: 0.2 },
+                                            default: { duration: 0.3, ease: "easeInOut" }
+                                        }}
                                         fill="none"
-                                        d={`M ${link.source.x} ${link.source.y} L ${link.target.x} ${link.target.y}`}
-                                        className="transition-colors duration-300 drop-shadow-md"
+                                        className="transition-colors drop-shadow-md"
                                     />
                                 );
                             })}
