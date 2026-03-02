@@ -4,12 +4,14 @@ import { User, LogOut, Settings, ChevronUp } from 'lucide-react';
 
 interface UserProfileProps {
     onLogout: () => void;
+    onNavigateToProfile?: () => void;
     userName?: string;
     email?: string;
 }
 
 export const UserProfile: React.FC<UserProfileProps> = ({
     onLogout,
+    onNavigateToProfile,
     userName = "Developer",
     email = "dev@algoverse.com"
 }) => {
@@ -34,7 +36,13 @@ export const UserProfile: React.FC<UserProfileProps> = ({
 
                         {/* Menu Items */}
                         <div className="space-y-1">
-                            <button className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-colors group">
+                            <button
+                                onClick={() => {
+                                    setIsOpen(false);
+                                    onNavigateToProfile?.();
+                                }}
+                                className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-colors group"
+                            >
                                 <User className="w-4 h-4 group-hover:neon-glow" />
                                 My Profile
                             </button>

@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useVisualizerStore } from '../../store/useVisualizerStore';
-import { Send, Zap, BrainCircuit, Activity } from 'lucide-react';
+import { Send, Activity } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { UserProfile } from './UserProfile';
 
-export const Sidebar: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
+export const Sidebar: React.FC<{ onLogout?: () => void; onNavigateToProfile?: () => void }> = ({ onLogout, onNavigateToProfile }) => {
     const [prompt, setPrompt] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
@@ -142,7 +142,7 @@ export const Sidebar: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
 
             {/* Profile Menu Bottom Left */}
             <div className="mt-auto border-t border-white/5 p-4 lg:p-6 bg-black/10">
-                <UserProfile onLogout={() => onLogout?.()} />
+                <UserProfile onLogout={() => onLogout?.()} onNavigateToProfile={() => onNavigateToProfile?.()} />
             </div>
         </div>
     );
