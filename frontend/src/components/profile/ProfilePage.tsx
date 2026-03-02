@@ -30,7 +30,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onBack }) => {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 1.02 }}
             transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute inset-0 z-40 flex flex-col items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
+            className="absolute inset-0 z-40 flex flex-col items-center justify-center p-4"
         >
             <div className="w-full max-w-2xl glass-panel rounded-3xl p-8 relative overflow-hidden">
 
@@ -134,8 +134,8 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onBack }) => {
                                 type="submit"
                                 disabled={isSaving}
                                 className={`relative px-6 py-2.5 rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-2 min-w-[140px] ${isSaved
-                                        ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                                        : 'bg-primary hover:bg-primary/90 text-white neon-glow'
+                                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                                    : 'bg-primary hover:bg-primary/90 text-white neon-glow'
                                     }`}
                             >
                                 {isSaving ? (

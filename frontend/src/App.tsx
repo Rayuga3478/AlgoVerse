@@ -32,18 +32,18 @@ function App() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0, scale: 0.98, filter: "blur(5px)" }}
             transition={{ duration: 0.6, ease: "easeOut" }}
-            className="flex flex-col lg:flex-row h-full w-full absolute inset-0"
+            className="flex flex-col lg:flex-row h-full w-full absolute inset-0 p-4 lg:p-6 gap-6"
           >
-            {/* Left Sidebar (AI Input + Explanation) - 40% */}
-            <div className="w-full lg:w-[40%] flex-shrink-0 z-20">
+            {/* Left Sidebar (AI Input + Explanation) */}
+            <div className="w-full lg:w-[35%] xl:w-[30%] flex-shrink-0 z-20 h-full">
               <Sidebar
                 onLogout={handleLogout}
                 onNavigateToProfile={() => setCurrentView('profile')}
               />
             </div>
 
-            {/* Right Area (Visualization + Controls) - 60% */}
-            <div className="flex-1 w-full lg:w-[60%] relative flex flex-col z-10">
+            {/* Right Area (Visualization + Controls) */}
+            <div className="flex-1 w-full relative flex flex-col z-10 h-full">
               <Canvas />
               <PlaybackControls />
             </div>

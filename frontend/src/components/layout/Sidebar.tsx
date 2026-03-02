@@ -43,7 +43,7 @@ export const Sidebar: React.FC<{ onLogout?: () => void; onNavigateToProfile?: ()
     };
 
     return (
-        <div className="flex w-full h-full relative z-10 border-r border-white/5 bg-black/20 backdrop-blur-3xl flex-col">
+        <div className="flex w-full h-full relative z-10 glass-panel rounded-[2rem] lg:rounded-[2.5rem] flex-col overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.5)] border-t border-l border-white/20">
             <div className="flex flex-1 overflow-hidden">
                 {/* Vertical Text Accent */}
                 <div className="w-16 flex items-center justify-center border-r border-white/5 relative hidden sm:flex">
