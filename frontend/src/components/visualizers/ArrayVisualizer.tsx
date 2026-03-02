@@ -82,16 +82,17 @@ export const ArrayVisualizer: React.FC = () => {
                             <motion.div
                                 key={item.id}
                                 layout
+                                layoutId={item.id}
                                 initial={{ opacity: 0, scale: 0.8, y: -20 }}
                                 animate={{ opacity: 1, scale: 1, y: 0 }}
                                 exit={{ opacity: 0, scale: 0.8, y: 20 }}
-                                transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                                transition={{ type: "spring", stiffness: 400, damping: 30 }}
                                 className={`
                   relative flex flex-col items-center justify-center 
                   w-16 h-16 sm:w-20 sm:h-20 rounded-2xl border font-space text-2xl font-light
-                  transition-all duration-500 backdrop-blur-md
+                  transition-colors duration-500 backdrop-blur-md
                   ${isHighlighted
-                                        ? 'border-rose-400/60 bg-rose-500/20 text-white shadow-[0_0_30px_rgba(244,63,94,0.4)] scale-110 z-10'
+                                        ? 'border-rose-400/60 bg-rose-500/20 text-white shadow-[0_0_30px_rgba(244,63,94,0.4)] z-10'
                                         : 'border-white/10 bg-white/5 text-white/80 shadow-[0_10px_40px_rgba(0,0,0,0.2)]'
                                     }
                 `}
