@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useVisualizerStore } from '../../store/useVisualizerStore';
 import { Send, Activity } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -8,9 +8,18 @@ export const Sidebar: React.FC<{ onLogout?: () => void; onNavigateToProfile?: ()
     const [prompt, setPrompt] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
+    const explanationRef = useRef<HTMLDivElement>(null);
 
     const { animation, currentStepIndex, setAnimation } = useVisualizerStore();
     const currentStep = animation?.steps[currentStepIndex];
+
+    useEffect(() => {
+        if (animation && explanationRef.current) {
+            setTimeout(() => {
+                explanationRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        }
+    }, [animation]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -109,6 +118,7 @@ export const Sidebar: React.FC<{ onLogout?: () => void; onNavigateToProfile?: ()
                     {/* Explanation Output Area */}
                     {animation && (
                         <motion.div
+                            ref={explanationRef}
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             className="mt-12 space-y-4 pb-8"
