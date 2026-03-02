@@ -8,15 +8,26 @@ export const Sidebar: React.FC<{ onLogout?: () => void; onNavigateToProfile?: ()
     const [prompt, setPrompt] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
     const explanationRef = useRef<HTMLDivElement>(null);
 
     const { animation, currentStepIndex, setAnimation } = useVisualizerStore();
     const currentStep = animation?.steps[currentStepIndex];
 
     useEffect(() => {
-        if (animation && explanationRef.current) {
+        if (animation && explanationRef.current && scrollContainerRef.current) {
+            // Give the DOM a tiny fraction of a second to render the new explanation div height
             setTimeout(() => {
-                explanationRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                const container = scrollContainerRef.current;
+                const explanationEl = explanationRef.current;
+                if (container && explanationEl) {
+                    // Calculate relative scroll position to avoid whole-page jumping
+                    const topPos = explanationEl.offsetTop;
+                    container.scrollTo({
+                        top: topPos - 40, // Add a little padding top
+                        behavior: 'smooth'
+                    });
+                }
             }, 100);
         }
     }, [animation]);
@@ -64,7 +75,10 @@ export const Sidebar: React.FC<{ onLogout?: () => void; onNavigateToProfile?: ()
                 </div>
 
                 {/* Main Content Area */}
-                <div className="flex-1 flex flex-col px-8 lg:px-16 py-12 relative overflow-y-auto custom-scrollbar">
+                <div
+                    ref={scrollContainerRef}
+                    className="flex-1 flex flex-col px-8 lg:px-16 py-12 relative overflow-y-auto custom-scrollbar"
+                >
 
                     {/* Header Section */}
                     <div className="mb-12">
