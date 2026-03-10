@@ -9,7 +9,7 @@ import { Code2, ChevronRight, Menu } from 'lucide-react';
 
 export const Canvas: React.FC = () => {
     const { animation } = useVisualizerStore();
-    const [showSteps, setShowSteps] = useState(true);
+    const [showSteps, setShowSteps] = useState(false);
 
     const renderVisualizer = () => {
         if (!animation) {

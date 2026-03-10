@@ -7,13 +7,15 @@ interface UserProfileProps {
     onNavigateToProfile?: () => void;
     userName?: string;
     email?: string;
+    avatarUrl?: string;
 }
 
 export const UserProfile: React.FC<UserProfileProps> = ({
     onLogout,
     onNavigateToProfile,
     userName = "Developer",
-    email = "dev@algoverse.com"
+    email = "dev@algoverse.com",
+    avatarUrl
 }) => {
     const [isOpen, setIsOpen] = useState(false);
 
@@ -69,10 +71,14 @@ export const UserProfile: React.FC<UserProfileProps> = ({
                 onClick={() => setIsOpen(!isOpen)}
                 className="flex items-center gap-3 p-3 w-full rounded-xl hover:bg-white/5 transition-all group border border-transparent hover:border-white/10"
             >
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-primary flex items-center justify-center flex-shrink-0 neon-glow">
-                    <span className="text-white font-bold text-sm">
-                        {userName.charAt(0).toUpperCase()}
-                    </span>
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-primary flex items-center justify-center flex-shrink-0 neon-glow overflow-hidden">
+                    {avatarUrl ? (
+                        <img src={avatarUrl} alt={userName} className="w-full h-full object-cover" />
+                    ) : (
+                        <span className="text-white font-bold text-sm">
+                            {userName.charAt(0).toUpperCase()}
+                        </span>
+                    )}
                 </div>
 
                 <div className="flex-1 text-left hidden sm:block">

@@ -1,27 +1,47 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { User, Mail, Shield, Camera, Bell, ArrowLeft, Loader2, Check } from 'lucide-react';
+import { User, Mail, Shield, Camera, Bell, ArrowLeft, Loader2, Check, Clock, Search, LogOut, Trash2 } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface ProfilePageProps {
     onBack: () => void;
+    onLogout: () => void;
 }
 
-export const ProfilePage: React.FC<ProfilePageProps> = ({ onBack }) => {
-    const [name, setName] = useState('Developer');
-    const [email, setEmail] = useState('dev@algoverse.com');
+export const ProfilePage: React.FC<ProfilePageProps> = ({ onBack, onLogout }) => {
+    const { user, updateProfile, deleteHistoryItem } = useAuth();
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    // Initialize with user data if available
+    const [name, setName] = useState(user?.name || '');
+    const [email] = useState(user?.email || ''); // Email is read-only
+    const [avatarUrl, setAvatarUrl] = useState(user?.avatarUrl || '');
     const [isSaving, setIsSaving] = useState(false);
     const [isSaved, setIsSaved] = useState(false);
 
-    const handleSave = (e: React.FormEvent) => {
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        // Convert image to base64 for simplistic MongoDB storage
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            const base64String = reader.result as string;
+            setAvatarUrl(base64String);
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSaving(true);
+        setIsSaved(false);
 
-        // Simulate API saving
-        setTimeout(() => {
-            setIsSaving(false);
-            setIsSaved(true);
-            setTimeout(() => setIsSaved(false), 2000);
-        }, 1000);
+        await updateProfile(name, avatarUrl);
+
+        setIsSaving(false);
+        setIsSaved(true);
+        setTimeout(() => setIsSaved(false), 2000);
     };
 
     return (
@@ -48,16 +68,40 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onBack }) => {
                         </div>
                         Back to Dashboard
                     </button>
-                    <h2 className="text-xl font-space font-bold tracking-tight text-white/90">Account Settings</h2>
+                    <div className="flex items-center gap-4">
+                        <button
+                            onClick={onLogout}
+                            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-rose-500/20 text-white/50 hover:text-rose-400 transition-all text-sm font-medium border border-transparent hover:border-rose-500/30 group"
+                        >
+                            <LogOut className="w-4 h-4" />
+                            Sign Out
+                        </button>
+                    </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-12">
 
                     {/* Avatar Section */}
                     <div className="flex flex-col items-center space-y-6">
-                        <div className="relative group cursor-pointer">
+                        <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            ref={fileInputRef}
+                            onChange={handleImageChange}
+                        />
+                        <div
+                            className="relative group cursor-pointer"
+                            onClick={() => fileInputRef.current?.click()}
+                        >
                             <div className="w-32 h-32 rounded-full border-2 border-white/10 bg-black/30 flex items-center justify-center overflow-hidden transition-all group-hover:border-primary/50 group-hover:neon-glow relative">
-                                <User className="w-12 h-12 text-white/20 group-hover:text-primary transition-colors" />
+                                {avatarUrl ? (
+                                    <img src={avatarUrl} alt={name} className="w-full h-full object-cover" />
+                                ) : (
+                                    <span className="text-white font-bold text-4xl">
+                                        {name.charAt(0).toUpperCase()}
+                                    </span>
+                                )}
 
                                 {/* Hover Overlay */}
                                 <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm">
@@ -101,7 +145,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onBack }) => {
                                     <input
                                         type="email"
                                         value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
+                                        readOnly
                                         className="w-full bg-black/20 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-sm text-white/50 cursor-not-allowed"
                                         disabled
                                     />
@@ -152,6 +196,57 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onBack }) => {
                         </div>
                     </form>
 
+                </div>
+
+                {/* Search History Section */}
+                <div className="mt-12 pt-8 border-t border-white/5">
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center neon-glow">
+                            <Clock className="w-5 h-5 text-primary" />
+                        </div>
+                        <div>
+                            <h3 className="text-lg font-space font-bold text-white">Search History</h3>
+                            <p className="text-xs text-zinc-400">Your recently generated algorithm visualizations</p>
+                        </div>
+                    </div>
+
+                    <div className="bg-black/20 border border-white/5 rounded-2xl overflow-hidden">
+                        {!user?.searchHistory || user.searchHistory.length === 0 ? (
+                            <div className="p-8 text-center flex flex-col items-center justify-center text-zinc-500">
+                                <Search className="w-8 h-8 mb-3 opacity-50" />
+                                <p className="text-sm">No search history yet.</p>
+                                <p className="text-xs mt-1">Generate your first visualization from the dashboard!</p>
+                            </div>
+                        ) : (
+                            <div className="max-h-[300px] overflow-y-auto custom-scrollbar">
+                                {user.searchHistory.slice().reverse().map((item, index) => (
+                                    <div
+                                        key={index}
+                                        className="flex items-center justify-between p-4 border-b border-white/5 last:border-0 hover:bg-white/5 transition-colors"
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center">
+                                                <Search className="w-4 h-4 text-white/40" />
+                                            </div>
+                                            <span className="text-sm font-medium text-white/90">"{item.prompt}"</span>
+                                        </div>
+                                        <div className="flex items-center gap-4">
+                                            <span className="text-xs text-zinc-500 font-mono">
+                                                {new Date(item.timestamp).toLocaleDateString()}
+                                            </span>
+                                            <button
+                                                onClick={() => deleteHistoryItem(item.timestamp)}
+                                                className="p-1.5 rounded-lg text-zinc-500 hover:text-rose-400 hover:bg-rose-500/10 transition-colors group/btn"
+                                                title="Delete this search"
+                                            >
+                                                <Trash2 className="w-4 h-4 group-hover/btn:scale-110 transition-transform" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
         </motion.div>

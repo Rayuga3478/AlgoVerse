@@ -94,28 +94,34 @@ export const TreeVisualizer: React.FC = () => {
                                 const isHighlightedEdge = sourceHighlight && targetHighlight;
 
                                 return (
-                                    <motion.path
+                                    <motion.line
                                         key={`${link.source.data.id}-${link.target.data.id}`}
                                         initial={{
                                             opacity: 0,
                                             pathLength: 0,
-                                            d: `M ${link.source.x} ${link.source.y} L ${link.target.x} ${link.target.y}`
+                                            x1: link.source.x,
+                                            y1: link.source.y,
+                                            x2: link.source.x, // start from source to grow
+                                            y2: link.source.y
                                         }}
                                         animate={{
                                             opacity: 1,
                                             pathLength: 1,
+                                            x1: link.source.x,
+                                            y1: link.source.y,
+                                            x2: link.target.x,
+                                            y2: link.target.y,
                                             stroke: isHighlightedEdge ? '#fda4af' : 'rgba(255,255,255,0.15)', // rose-300 or white/15
                                             strokeWidth: isHighlightedEdge ? 4 : 2,
-                                            d: `M ${link.source.x} ${link.source.y} L ${link.target.x} ${link.target.y}`
                                         }}
                                         exit={{ opacity: 0 }}
                                         transition={{
-                                            d: { type: "spring", stiffness: 300, damping: 25 },
+                                            type: "spring", stiffness: 300, damping: 25,
                                             opacity: { duration: 0.2 },
-                                            default: { duration: 0.3, ease: "easeInOut" }
+                                            stroke: { duration: 0.3 }
                                         }}
-                                        fill="none"
-                                        className="transition-colors drop-shadow-md"
+                                        className="drop-shadow-md"
+                                        strokeLinecap="round"
                                     />
                                 );
                             })}

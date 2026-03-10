@@ -5,16 +5,16 @@ dotenv.config();
 
 // Ensure the API key is available
 if (!process.env.GROQ_API_KEY) {
-    throw new Error('GROQ_API_KEY is not configured.');
+  throw new Error('GROQ_API_KEY is not configured.');
 }
 
 const openai = new OpenAI({
-    apiKey: process.env.GROQ_API_KEY,
-    baseURL: "https://api.groq.com/openai/v1",
+  apiKey: process.env.GROQ_API_KEY,
+  baseURL: "https://api.groq.com/openai/v1",
 });
 
 export async function generateDSASteps(prompt: string) {
-    const systemPrompt = `
+  const systemPrompt = `
 You are AlgoVerse, an expert Computer Science tutor and Data Structure/Algorithm behavior engine.
 The user will give you a prompt like "Sort 5, 2, 9, 1 using quicksort" or "Find shortest path from A to D".
 You must return a JSON object EXACTLY matching this structure, and absolutely nothing else (no markdown wrapping):
@@ -55,8 +55,9 @@ RULES:
    - For linked lists: "state": { "linked_list": [{ "id": "1", "value": 10, "next": "2" }, { "id": "2", "value": 20 }] }
 8. IMPORTANT: You must output ONLY valid JSON. Do not include markdown blocks, backticks, or any conversational text.
 9. TOPIC EXPLANATION: When asked to explain a topic, algorithm, or data structure, the FIRST step in the 'steps' array MUST contain a clear, detailed explanation of what the topic is in the 'explanation' field. The 'action' can be "explain". YOU MUST STILL provide a full step-by-step visual animation demonstrating the topic in the SUBSEQUENT steps. Do not stop at just one step.
-10. NO NULL POINTERS: All values in the 'pointers' object MUST be strings or numbers. Do NOT use 'null'. If a pointer doesn't exist yet, omit it from the object entirely.
-11. STRICT DOMAIN ENFORCEMENT: You are EXCLUSIVELY a Data Structures and Algorithms visualizer. If the user asks ANY question or provides any prompt that is NOT related to Computer Science, algorithms, data structures, or coding (e.g., "how to bake a cake", "what is the capital of France", "write a poem", "hello"), you MUST completely reject the prompt.
+10. GENERAL DSA QUESTIONS: If the user asks a very broad question like "What is DSA?" or "What is a Data Structure?", you MUST NOT reject it. Instead, explain the concepts thoroughly in the 'explanation' field of the first few steps, and use a basic 'array' structure to visually demonstrate storing and accessing data as an example of what a data structure looks like.
+11. NO NULL POINTERS: All values in the 'pointers' object MUST be strings or numbers. Do NOT use 'null'. If a pointer doesn't exist yet, omit it from the object entirely.
+12. STRICT DOMAIN ENFORCEMENT: You are EXCLUSIVELY a Data Structures and Algorithms visualizer. If the user asks ANY question or provides any prompt that is NOT related to Computer Science, algorithms, data structures, or coding (e.g., "how to bake a cake", "what is the capital of France", "write a poem", "hello"), you MUST completely reject the prompt.
     - If rejecting, return exactly this JSON:
       {
         "structure": "array",
@@ -75,28 +76,28 @@ RULES:
       }
 `;
 
-    try {
-        const chatCompletion = await openai.chat.completions.create({
-            messages: [
-                {
-                    role: "system",
-                    content: systemPrompt
-                },
-                {
-                    role: "user",
-                    content: prompt
-                }
-            ],
-            model: "llama-3.3-70b-versatile",
-            response_format: { type: "json_object" },
-            temperature: 0.1, // Keep it deterministic
-        });
+  try {
+    const chatCompletion = await openai.chat.completions.create({
+      messages: [
+        {
+          role: "system",
+          content: systemPrompt
+        },
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+      model: "llama-3.3-70b-versatile",
+      response_format: { type: "json_object" },
+      temperature: 0.1, // Keep it deterministic
+    });
 
-        const text = chatCompletion.choices[0]?.message?.content || "";
+    const text = chatCompletion.choices[0]?.message?.content || "";
 
-        return JSON.parse(text);
-    } catch (error) {
-        console.error("Groq Error:", error);
-        throw error;
-    }
+    return JSON.parse(text);
+  } catch (error) {
+    console.error("Groq Error:", error);
+    throw error;
+  }
 }

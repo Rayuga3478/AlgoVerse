@@ -1,8 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useVisualizerStore } from '../../store/useVisualizerStore';
-import { Send, Activity } from 'lucide-react';
+import { Send, Activity, PlayCircle, Map, LayoutDashboard } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useAuth } from '../../contexts/AuthContext';
 import { UserProfile } from './UserProfile';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 export const Sidebar: React.FC<{ onLogout?: () => void; onNavigateToProfile?: () => void }> = ({ onLogout, onNavigateToProfile }) => {
     const [prompt, setPrompt] = useState('');
@@ -13,6 +15,25 @@ export const Sidebar: React.FC<{ onLogout?: () => void; onNavigateToProfile?: ()
 
     const { animation, currentStepIndex, setAnimation } = useVisualizerStore();
     const currentStep = animation?.steps[currentStepIndex];
+    const { user, refreshUser } = useAuth();
+    const location = useLocation();
+    const navigate = useNavigate();
+    const isAutoPromptHandled = useRef(false);
+
+    useEffect(() => {
+        const autoPrompt = location.state?.autoPrompt;
+        if (autoPrompt && !isAutoPromptHandled.current) {
+            isAutoPromptHandled.current = true;
+            setPrompt(autoPrompt);
+            generateAnimation(autoPrompt);
+            // Clear state properly via React Router so it doesn't re-trigger
+            navigate(location.pathname, { replace: true, state: {} });
+        }
+        // Reset the guard when there's no autoPrompt (e.g. user navigated away and back)
+        if (!autoPrompt) {
+            isAutoPromptHandled.current = false;
+        }
+    }, [location.state?.autoPrompt]);
 
     useEffect(() => {
         if (animation && explanationRef.current && scrollContainerRef.current) {
@@ -32,9 +53,8 @@ export const Sidebar: React.FC<{ onLogout?: () => void; onNavigateToProfile?: ()
         }
     }, [animation]);
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!prompt.trim()) return;
+    const generateAnimation = async (promptText: string) => {
+        if (!promptText.trim()) return;
 
         setIsLoading(true);
         setErrorMsg('');
@@ -43,7 +63,7 @@ export const Sidebar: React.FC<{ onLogout?: () => void; onNavigateToProfile?: ()
             const response = await fetch('http://localhost:5000/api/ai/generate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompt })
+                body: JSON.stringify({ prompt: promptText })
             });
 
             if (!response.ok) {
@@ -54,12 +74,32 @@ export const Sidebar: React.FC<{ onLogout?: () => void; onNavigateToProfile?: ()
             const animationData = await response.json();
             setAnimation(animationData);
             setPrompt('');
+
+            // Save to search history if logged in
+            if (user) {
+                try {
+                    await fetch('http://localhost:5000/api/user/history', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ firebaseUid: user.firebaseUid, prompt: promptText })
+                    });
+                    await refreshUser(); // Fetch updated history
+                } catch (historyError) {
+                    console.error('Could not save search history', historyError);
+                }
+            }
+
         } catch (error: any) {
             console.error(error);
             setErrorMsg(error.message || 'Error connecting to AI backend.');
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        await generateAnimation(prompt);
     };
 
     return (
@@ -77,22 +117,35 @@ export const Sidebar: React.FC<{ onLogout?: () => void; onNavigateToProfile?: ()
                 {/* Main Content Area */}
                 <div
                     ref={scrollContainerRef}
-                    className="flex-1 flex flex-col px-8 lg:px-16 py-12 relative overflow-y-auto custom-scrollbar"
+                    className="flex-1 flex flex-col px-8 lg:px-12 py-10 relative overflow-y-auto custom-scrollbar"
                 >
 
                     {/* Header Section */}
-                    <div className="mb-12">
-                        <div className="flex items-center gap-4 mb-6">
+                    <div className="mb-8">
+                        <div className="flex items-center gap-4 mb-4">
                             <div className="w-12 h-[1px] bg-white/30"></div>
                             <span className="text-xs uppercase tracking-[0.2em] font-space text-white/70 font-medium">Interactive Visualizer</span>
                         </div>
-                        <h1 className="text-6xl xl:text-8xl font-space font-light text-white tracking-tighter leading-none mb-6">
+                        <h1 className="text-5xl xl:text-6xl font-space font-light text-white tracking-tighter leading-none mb-4">
                             Algo<br />
                             <span className="font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-300 to-rose-300">Verse</span>
                         </h1>
-                        <p className="text-sm font-inter text-white/50 max-w-sm leading-relaxed">
+                        <p className="text-xs font-inter text-white/50 max-w-sm leading-relaxed">
                             Experience data structures and algorithms through seamless, cinematic animations. Enter a command below to generate your visualization.
                         </p>
+                    </div>
+
+                    {/* Navigation Links */}
+                    <div className="mb-8 flex flex-wrap gap-3">
+                        <Link to="/visualizer" className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-colors text-xs font-semibold uppercase tracking-wider">
+                            <PlayCircle className="w-4 h-4 text-indigo-400" /> Visualizer
+                        </Link>
+                        <Link to="/roadmap" className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-colors text-xs font-semibold uppercase tracking-wider">
+                            <Map className="w-4 h-4 text-rose-400" /> Roadmap
+                        </Link>
+                        <Link to="/dashboard" className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-colors text-xs font-semibold uppercase tracking-wider">
+                            <LayoutDashboard className="w-4 h-4 text-emerald-400" /> Dashboard
+                        </Link>
                     </div>
 
                     {/* Input Form Section */}
@@ -130,7 +183,7 @@ export const Sidebar: React.FC<{ onLogout?: () => void; onNavigateToProfile?: ()
                     </div>
 
                     {/* Explanation Output Area */}
-                    {animation && (
+                    {animation && location.pathname === '/visualizer' && (
                         <motion.div
                             ref={explanationRef}
                             initial={{ opacity: 0, y: 20 }}
@@ -166,7 +219,13 @@ export const Sidebar: React.FC<{ onLogout?: () => void; onNavigateToProfile?: ()
 
             {/* Profile Menu Bottom Left */}
             <div className="mt-auto border-t border-white/5 p-4 lg:p-6 bg-black/10">
-                <UserProfile onLogout={() => onLogout?.()} onNavigateToProfile={() => onNavigateToProfile?.()} />
+                <UserProfile
+                    onLogout={() => onLogout?.()}
+                    onNavigateToProfile={() => onNavigateToProfile?.()}
+                    userName={user?.name}
+                    email={user?.email}
+                    avatarUrl={user?.avatarUrl}
+                />
             </div>
         </div>
     );
